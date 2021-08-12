@@ -3,3 +3,6 @@ build:
 
 run:
 	go run cmd/ova-track-api/main.go
+
+test:
+	go test  ./...
