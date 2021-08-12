@@ -4,22 +4,16 @@ import "fmt"
 
 func DivideIntoBatches(slice []uint8, batchSize int) [][]uint8 {
 
-	if batchSize == 0 {
-		panic("Batch size can't be 0")
+	if batchSize <= 0 {
+		panic("Incorrect batch size")
 	}
-	curSlice := make([]uint8, 0)
 	result := make([][]uint8, 0)
-	for i, v := range slice {
-		curSlice = append(curSlice, v)
-		if (i+1)%batchSize == 0 {
-			tmp := make([]uint8, batchSize)
-			copy(tmp, curSlice)
-			result = append(result, tmp)
-			curSlice = curSlice[:0]
+	lastBegin := 0
+	for i, _ := range slice {
+		if (i+1)%batchSize == 0 || i == len (slice) - 1 {
+			result = append(result, slice[lastBegin: i + 1])
+			lastBegin = i + 1
 		}
-	}
-	if len(curSlice) != 0 {
-		result = append(result, curSlice)
 	}
 	return result
 }
@@ -30,9 +24,7 @@ func InverseMap(data map[string]int) map[int]string {
 	for key, value := range data {
 		_, contains := result[value]
 		if contains {
-			errDescription := ""
-			errDescription = fmt.Sprintf(errDescription, "Key %d contains twice", value)
-			panic(errDescription)
+			panic(fmt.Sprintf( "Key %d contains twice", value))
 		}
 		result[value] = key
 	}

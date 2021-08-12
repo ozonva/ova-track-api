@@ -13,8 +13,9 @@ func TestDivideIntoBatches(t *testing.T) {
 
 	testData := [...]divideIntoBatchesTestData{
 		{[]uint8{1, 1, 2, 2, 3, 3, 4}, 2, [][]uint8{{1, 1}, {2, 2}, {3, 3}, {4}}},
+		{[]uint8{1, 1, 2, 2, 3, 3, 4, 4}, 2, [][]uint8{{1, 1}, {2, 2}, {3, 3}, {4, 4}}},
 		{[]uint8{1, 2, 3, 4}, 1, [][]uint8{{1}, {2}, {3}, {4}}},
-		{[]uint8{1, 2, 3, 4}, 0, [][]uint8{}},
+		// {[]uint8{1, 2, 3, 4}, 0, [][]uint8{}},
 	}
 
 	for i := range testData {
