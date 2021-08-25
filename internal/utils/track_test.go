@@ -74,7 +74,7 @@ func TestGetArtistTracks(t *testing.T) {
 		if len (tracksOfArtistB) != 1 {
 			t.Errorf("invalid amount tracks of artist_b")
 		}
-		if (!exists(&tracksOfArtistA, &Track{4, "track_b", "album_b", "artist_b"})) {
+		if (!exists(&tracksOfArtistB, &Track{4, "track_b", "album_b", "artist_b"})) {
 			t.Errorf("cant find track b")
 		}
 	}
@@ -118,6 +118,7 @@ func TestGetArtistAlbumTracks(t *testing.T) {
 func TestInitLibraryFromArray(t *testing.T) {
 
 	{
+		resetLibrary()
 		lines := make([]string, 0)
 		lines = append(lines, string("artist_a, album_a, track_a"))
 		lines = append(lines, string("artist_a, album_a, track_aa"))

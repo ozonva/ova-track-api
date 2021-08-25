@@ -1,6 +1,6 @@
 package repo
 
-import "github.com/ozonva/ova-task-api/internal/utils"
+import "github.com/ozonva/ova-track-api/internal/utils"
 
 type TrackRepo interface {
 	Add ([]utils.Track) error
