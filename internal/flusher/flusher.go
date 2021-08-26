@@ -6,6 +6,12 @@ import (
 	"log"
 )
 
+func min (a int, b int) int {
+	if a > b {
+		return b
+	}
+	return a
+}
 type Flusher interface {
 	Flush ([]utils.Track)[]utils.Track
 }
@@ -24,15 +30,14 @@ func (flusher ChunkFlusher) Flush (tracks []utils.Track)[]utils.Track {
 	failedToAdd := make([]utils.Track, 0)
 	curSlice := make([]utils.Track, 0, flusher.chunkSize)
 
-	for i, _ := range tracks{
-		curSlice = append(curSlice, tracks[i])
-		if (((i + 1) % flusher.chunkSize) == 0) || (i + 1 == len (tracks)) {
-			err := flusher.repo.Add(curSlice)
-			if err != nil {
-				failedToAdd = append(failedToAdd, curSlice...)
-			}
-			curSlice = curSlice[:0]
+	for i := 0; i < len(tracks); i += flusher.chunkSize {
+		next:=i+min(flusher.chunkSize, len(tracks) - i)
+		curSlice = append(curSlice, tracks[i:next]...)
+		err := flusher.repo.Add(curSlice)
+		if err != nil {
+			failedToAdd = append(failedToAdd, curSlice...)
 		}
+		curSlice = curSlice[:0]
 	}
 
 	if len (failedToAdd) == 0 {
