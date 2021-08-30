@@ -40,7 +40,6 @@ func main() {
 
 	log.Printf("TCP at %v started successfully", port)
 
-
 	grpcService := grpc.NewServer()
 	track_server.RegisterTrackServer(grpcService, track_server.UnimplementedTrackServer{})
 
@@ -48,5 +47,4 @@ func main() {
 	if err := grpcService.Serve(listen); err != nil {
 		log.Printf("failed to serve: %v", err)
 	}
-	log.Printf ("Track service started successfully")
 }
