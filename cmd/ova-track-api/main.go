@@ -1,34 +1,36 @@
 package main
 
 import (
-	"github.com/ozonva/ova-track-api/internal/utils"
-	track_server "github.com/ozonva/ova-track-api/pkg/api/github.com/ova-conference-api/pkg/ova-conference-api"
-	"github.com/rs/zerolog/log"
+	"database/sql"
+	_ "github.com/jackc/pgx/v4"
+	_ "github.com/jackc/pgx/v4/stdlib"
+	"github.com/ozonva/ova-track-api/internal/api"
+
+	//"github.com/ozonva/ova-track-api/internal/api"
+	"github.com/ozonva/ova-track-api/internal/repo"
+
+	track_server "github.com/ozonva/ova-track-api/pkg/api/github.com/ova-track-api/pkg/ova-track-api"
 	"google.golang.org/grpc"
+
+	"log"
 	"net"
 	"strconv"
 )
 
-var id = uint64(0)
-func GenerateTrack (n int,  name string)  utils.Track {
-	res := ""
-	for i := 0; i < n; i++{
-		res+=name
-	}
-	id++
-	return utils.Track{TrackId: id, TrackName: res, Album: res, Artist: res}
-}
-
-//fmt.Println("Hi, i am ova-track-api!")
-//if len(os.Args) != 2 {
-//	fmt.Println("Path to config is strictly required")
-//	return
-//}
-//path := os.Args[1]
-//utils.InitLibraryFromFile(path)
-
 
 func main() {
+
+	dsn :=  "postgres://admin:admin@localhost:5434/db?sslmode=disable"
+
+	pdb, err := sql.Open("pgx", dsn)
+	if err != nil {
+		log.Fatalf("failed to load driver: %v", err)
+	}
+
+	err = pdb.Ping()
+	if err != nil {
+		log.Fatalf("failed to connect to db: %v", err)
+	}
 
 	port := ":"+strconv.Itoa(8080)
 	listen, err := net.Listen("tcp", port)
@@ -41,7 +43,8 @@ func main() {
 	log.Printf("TCP at %v started successfully", port)
 
 	grpcService := grpc.NewServer()
-	track_server.RegisterTrackServer(grpcService, track_server.UnimplementedTrackServer{})
+	rp :=repo.NewSQLTrackRepo(pdb)
+	track_server.RegisterTrackServer(grpcService, api.NewApiServer(rp))
 
 	log.Print("Starting track service")
 	if err := grpcService.Serve(listen); err != nil {

@@ -25,7 +25,7 @@ func NewChunkFlusher (chunkSize int, repo repo.TrackRepo) ChunkFlusher{
 	return ChunkFlusher{chunkSize, repo}
 }
 
-func (flusher ChunkFlusher) Flush (tracks []utils.Track)[]utils.Track {
+func (flusher* ChunkFlusher) Flush (tracks []utils.Track)[]utils.Track {
 
 	failedToAdd := make([]utils.Track, 0)
 	curSlice := make([]utils.Track, 0, flusher.chunkSize)

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/ozonva/ova-track-api/internal/flusher"
 	"github.com/ozonva/ova-track-api/internal/utils"
+	"log"
 	"time"
 )
 
@@ -41,12 +42,14 @@ type Saver interface {
 }
 
 type TimelapseBufferedSaver struct {
+	inited bool
 	bs BufferedSaver
 	timer time.Timer
 }
 
 func (tls * TimelapseBufferedSaver) Init (msc int64)  {
 	timer := time.NewTimer(time.Duration(msc) * time.Millisecond)
+	tls.inited = true
 	for true {
 		select {
 		case <-timer.C:
@@ -56,16 +59,20 @@ func (tls * TimelapseBufferedSaver) Init (msc int64)  {
 }
 
 func (tls * TimelapseBufferedSaver) Save (tracks []utils.Track)  {
+	log.Printf("Save called")
 	tls.bs.SaveToBuffer(tracks)
 }
 
 func (tls * TimelapseBufferedSaver) Close ()  {
+	if !tls.inited {
+		return
+	}
 	tls.timer.Stop()
 	tls.bs.FlushBuffer()
 }
 
 func NewTimelapseBufferedSaver (bufferSaver BufferedSaver) TimelapseBufferedSaver{
-	return TimelapseBufferedSaver {bufferSaver, time.Timer{}}
+	return TimelapseBufferedSaver {false, bufferSaver, time.Timer{}}
 }
 
 // ====================================================================================
