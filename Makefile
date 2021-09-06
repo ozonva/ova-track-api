@@ -12,6 +12,7 @@ deps:
     GOBIN=$(LOCAL_BIN) go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
     GOBIN=$(LOCAL_BIN) go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
     GOBIN=$(LOCAL_BIN) go install github.com/pressly/goose/v3/cmd/goose
+    GOBIN=$(LOCAL_BIN) go install github.com/prometheus/client_golang/prometheus
 
 
 .PHONY: generate

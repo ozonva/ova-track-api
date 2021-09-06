@@ -23,6 +23,8 @@ type TrackClient interface {
 	GetTrackID(ctx context.Context, in *TrackDescription, opts ...grpc.CallOption) (*TrackID, error)
 	GetRegisteredTracks(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TracksDescriptions, error)
 	RemoveTrackByID(ctx context.Context, in *TrackID, opts ...grpc.CallOption) (*Empty, error)
+	MultiCreateTrack(ctx context.Context, in *TracksDescriptions, opts ...grpc.CallOption) (*Empty, error)
+	UpdateTrack(ctx context.Context, in *TrackUpdateData, opts ...grpc.CallOption) (*Empty, error)
 }
 
 type trackClient struct {
@@ -78,6 +80,24 @@ func (c *trackClient) RemoveTrackByID(ctx context.Context, in *TrackID, opts ...
 	return out, nil
 }
 
+func (c *trackClient) MultiCreateTrack(ctx context.Context, in *TracksDescriptions, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, "/ova.track.api.Track/MultiCreateTrack", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *trackClient) UpdateTrack(ctx context.Context, in *TrackUpdateData, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, "/ova.track.api.Track/UpdateTrack", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TrackServer is the server API for Track service.
 // All implementations must embed UnimplementedTrackServer
 // for forward compatibility
@@ -87,6 +107,8 @@ type TrackServer interface {
 	GetTrackID(context.Context, *TrackDescription) (*TrackID, error)
 	GetRegisteredTracks(context.Context, *Empty) (*TracksDescriptions, error)
 	RemoveTrackByID(context.Context, *TrackID) (*Empty, error)
+	MultiCreateTrack(context.Context, *TracksDescriptions) (*Empty, error)
+	UpdateTrack(context.Context, *TrackUpdateData) (*Empty, error)
 	mustEmbedUnimplementedTrackServer()
 }
 
@@ -108,6 +130,12 @@ func (UnimplementedTrackServer) GetRegisteredTracks(context.Context, *Empty) (*T
 }
 func (UnimplementedTrackServer) RemoveTrackByID(context.Context, *TrackID) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RemoveTrackByID not implemented")
+}
+func (UnimplementedTrackServer) MultiCreateTrack(context.Context, *TracksDescriptions) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MultiCreateTrack not implemented")
+}
+func (UnimplementedTrackServer) UpdateTrack(context.Context, *TrackUpdateData) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateTrack not implemented")
 }
 func (UnimplementedTrackServer) mustEmbedUnimplementedTrackServer() {}
 
@@ -212,6 +240,42 @@ func _Track_RemoveTrackByID_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Track_MultiCreateTrack_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TracksDescriptions)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TrackServer).MultiCreateTrack(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ova.track.api.Track/MultiCreateTrack",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TrackServer).MultiCreateTrack(ctx, req.(*TracksDescriptions))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Track_UpdateTrack_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TrackUpdateData)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TrackServer).UpdateTrack(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ova.track.api.Track/UpdateTrack",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TrackServer).UpdateTrack(ctx, req.(*TrackUpdateData))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Track_ServiceDesc is the grpc.ServiceDesc for Track service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -238,6 +302,14 @@ var Track_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RemoveTrackByID",
 			Handler:    _Track_RemoveTrackByID_Handler,
+		},
+		{
+			MethodName: "MultiCreateTrack",
+			Handler:    _Track_MultiCreateTrack_Handler,
+		},
+		{
+			MethodName: "UpdateTrack",
+			Handler:    _Track_UpdateTrack_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -36,7 +36,6 @@ func (pr PrintRepo) Remove (id uint64) error{
 }
 
 
-const uint64max = 18446744073709551615
 type SQLTrackRepo struct {
 	db *sql.DB
 	nextId uint64
@@ -44,9 +43,15 @@ type SQLTrackRepo struct {
 }
 
 
+func NewSQLTrackRepo (pdb *sql.DB) *SQLTrackRepo {
+	repo := SQLTrackRepo {pdb, utils.InitialTrackId, false}
+	repo.initRepo()
+	return &repo
+}
+
 func (sql *SQLTrackRepo) initRepo () {
 	if !sql.inited{
-		tracks, _ := sql.List(uint64max-1, 0)
+		tracks, _ := sql.List(utils.MaxTrackId, 0)
 		for _, v := range tracks{
 			if v.TrackId > sql.nextId{
 				sql.nextId = v.TrackId
@@ -57,14 +62,8 @@ func (sql *SQLTrackRepo) initRepo () {
 	}
 }
 
-func NewSQLTrackRepo (pdb *sql.DB) *SQLTrackRepo {
-	repo := SQLTrackRepo {pdb, 0, false}
-	repo.initRepo()
-	return &repo
-}
-
 func (sql *SQLTrackRepo) Add (tracks []utils.Track) error{
-	if sql.nextId == uint64max{
+	if sql.nextId == utils.MaxTrackId{
 		return errors.New("cant add anymore tracks")
 	}
 	builder := squirrel.
@@ -79,9 +78,8 @@ func (sql *SQLTrackRepo) Add (tracks []utils.Track) error{
 	if err != nil {
 		return err
 	}
-
-	_, err = sql.db.Exec(query, args...)
-	return err
+	 _, err = sql.db.Exec(query, args...)
+	 return err
 }
 func (sql *SQLTrackRepo) List (limit, offset uint64) ([]utils.Track, error){
 

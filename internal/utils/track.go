@@ -16,6 +16,9 @@ func resetLibrary () {
 	generalLibrary = nil
 }
 
+const InitialTrackId = uint64 (0)
+const MaxTrackId = uint64 (18446744073709551615)
+
 type Track struct
 {
 	TrackId uint64

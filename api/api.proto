@@ -10,6 +10,8 @@ service Track{
   rpc GetTrackID (TrackDescription) returns (TrackID) {}
   rpc GetRegisteredTracks (Empty) returns (TracksDescriptions) {}
   rpc RemoveTrackByID (TrackID) returns (Empty) {}
+  rpc MultiCreateTrack (TracksDescriptions) returns (Empty) {}
+  rpc UpdateTrack(TrackUpdateData) returns (Empty) {}
 }
 
 
@@ -18,7 +20,10 @@ message TrackDescription{
   string artist = 2;
   string album = 3;
 }
-message Empty{
+
+message TrackUpdateData{
+  TrackID id = 1;
+  TrackDescription description = 2;
 }
 
 message TracksDescriptions{
@@ -28,4 +33,6 @@ message TracksDescriptions{
 message TrackID{
   uint64 track_id = 1;
 }
+
+message Empty{}
 
