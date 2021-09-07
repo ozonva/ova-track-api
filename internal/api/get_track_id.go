@@ -17,7 +17,7 @@ func (s *ApiServer) GetTrackID (ctx context.Context, td *desc.TrackDescription) 
 	}
 
 	log.Info().Caller().Str("name", td.Name).Str("album", td.GetAlbum()).Str("artist", td.GetArtist())
-	tracks, err := s.rep.List(18446744073709551615,0)
+	tracks, err := s.repo.List(18446744073709551615,0)
 	span, ctx := ot.StartSpanFromContext(ctx, "DescribeTrackByID")
 	span.LogFields(otl.String("looking for a id of track", td.GetName()))
 	defer span.Finish()

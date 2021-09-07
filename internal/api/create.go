@@ -28,7 +28,7 @@ func (s *ApiServer) CreateTrack(ctx context.Context, req *desc.TrackDescription)
 	span.LogFields(otl.String("creating track", req.String()))
 	defer span.Finish()
 
-	addRes := s.rep.Add([]utils.Track{{utils.InitialTrackId, req.Name, req.Album, req.Album}})
+	addRes := s.repo.Add([]utils.Track{{utils.InitialTrackId, req.Name, req.Album, req.Album}})
 	if addRes == nil{
 		s.metrics.IncSuccessCreateTrackCounter()
 	}

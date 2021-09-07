@@ -3,14 +3,13 @@ package main
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	_ "github.com/jackc/pgx/v4"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	ot "github.com/opentracing/opentracing-go"
 	"github.com/ozonva/ova-track-api/internal/api"
+	kafka "github.com/ozonva/ova-track-api/internal/kafka_client"
 	"github.com/ozonva/ova-track-api/internal/repo"
 	track_server "github.com/ozonva/ova-track-api/pkg/api/github.com/ova-track-api/pkg/ova-track-api"
-	kafka "github.com/ozonva/ova-track-api/internal/kafka_client"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/uber/jaeger-client-go"
 	jgrc "github.com/uber/jaeger-client-go/config"
@@ -28,7 +27,7 @@ import (
 
 func main() {
 
-	fmt.Println("Hi, i am ova-track-api!")
+	log.Println("Hi, i am ova-track-api!")
 	go runPrometheus()
 
 	tracer, closer := initTracer()
@@ -39,27 +38,26 @@ func main() {
 
 	pdb, err := sql.Open("pgx", dsn)
 	if err != nil {
-		log.Fatalf("failed to load driver: %v", err)
+		log.Println("failed to load driver", err)
 	}
 
 	err = pdb.Ping()
 	if err != nil {
-		log.Fatalf("failed to connect to db: %v", err)
+		log.Fatalln("failed to connect to db:", err)
 	}
 
 	port := ":"+strconv.Itoa(8080)
 	listen, err := net.Listen("tcp", port)
-	log.Printf("TCP at %v is starting up ...", port)
+	log.Println("TCP is starting up at port ", port)
 
 	if err != nil {
-		log.Printf("Failed to listen server %v", err)
+		log.Fatalln("Failed to listen server  ", err)
 	}
 
-	log.Printf("TCP at %v started successfully", port)
+	log.Println("TCP started successfully", port)
 
 	grpcService := grpc.NewServer()
 	rp :=repo.NewSQLTrackRepo(pdb)
-	fmt.Println("Hi, i am ova-recipe-api!")
 	kafkaClient := kafka.NewKafkaClient()
 	kafkaConn := "kafka:9092"
 	if kafkaConnErr := kafkaClient.Connect(context.Background(), kafkaConn, "CUDEvents",0); kafkaConnErr != nil{
@@ -68,16 +66,16 @@ func main() {
 
 	track_server.RegisterTrackServer(grpcService, api.NewApiServer(rp,api.NewApiMetrics(),kafkaClient))
 
-	log.Print("Starting track service")
+	log.Println("Starting track service")
 	if err := grpcService.Serve(listen); err != nil {
-		log.Printf("failed to serve: %v", err)
+		log.Fatalln("failed to serve", err)
 	}
 }
 
 func runPrometheus() {
 	http.Handle("/metrics", promhttp.Handler())
 	if err := http.ListenAndServe(":8081", nil); err != nil {
-		log.Fatalf("Failed to start listen to metric requests, error %s", err)
+		log.Fatalln("failed to start listen to metric requests, error", err)
 	}
 }
 
@@ -102,7 +100,7 @@ func initTracer() (ot.Tracer, io.Closer) {
 		jgrc.Metrics(jMetricsFactory),
 	)
 	if err != nil {
-		log.Fatalf("Can not create tracer, %s", err)
+		log.Fatalln("Can not create tracer", err)
 	}
 	return tracer, closer
 }

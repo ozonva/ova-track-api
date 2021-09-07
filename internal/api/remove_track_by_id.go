@@ -15,7 +15,7 @@ func (s *ApiServer) RemoveTrackByID(ctx context.Context, dsc *desc.TrackID) (*de
 	}
 
 	log.Info().Caller().Uint64("id", dsc.TrackId)
-	removeRes := s.rep.Remove(dsc.TrackId)
+	removeRes := s.repo.Remove(dsc.TrackId)
 	if removeRes == nil{
 		s.metrics.IncSuccessRemoveTrackCounter()
 	}

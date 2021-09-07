@@ -30,7 +30,7 @@ func (s *ApiServer) MultiCreateTrack(ctx context.Context, req *desc.TracksDescri
 	childSpan := ot.StartSpan("MultiCreateTrackBatching", ot.ChildOf(span.Context()))
 	for _, batch := range splitIntoBatches {
 		childSpan.LogFields(otl.Int("Inserting tracks", len(batch)))
-		err := s.rep.Add(batch)
+		err := s.repo.Add(batch)
 		if err != nil {
 			log.Error().Msgf("Can't add new track, error: %s", err)
 			return nil, err

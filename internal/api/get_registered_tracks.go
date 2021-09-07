@@ -20,7 +20,7 @@ func (s *ApiServer) GetRegisteredTracks (ctx context.Context, em *desc.Empty) (*
 	defer span.Finish()
 
 	log.Info().Caller()
-	tracks, err := s.rep.List(18446744073709551615,0)
+	tracks, err := s.repo.List(18446744073709551615,0)
 	if err != nil {
 		return &desc.TracksDescriptions{}, err
 	}

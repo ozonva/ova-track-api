@@ -21,7 +21,7 @@ func (s *ApiServer) DescribeTrackByID (ctx context.Context, trackId *desc.TrackI
 	span.LogFields(otl.Uint64("describing track", trackId.TrackId))
 	defer span.Finish()
 
-	trk, err := s.rep.Describe(trackId.TrackId)
+	trk, err := s.repo.Describe(trackId.TrackId)
 	if err == nil {
 		s.metrics.IncGetTrackCounter()
 		return &desc.TrackDescription {Name: trk.TrackName, Artist: trk.Artist, Album: trk.Album}, nil

@@ -14,7 +14,7 @@ const (
 	getEvent
 )
 
-type IKafkaClient interface {
+type KafkaClientInterface interface {
 	Connect(ctx context.Context, dsn string, topic string, partition int) error
 	SendMessage(bytes []byte) error
 }
@@ -23,7 +23,7 @@ type KafkaClient struct {
 	conn *kafka.Conn
 }
 
-func NewKafkaClient() IKafkaClient {
+func NewKafkaClient() KafkaClientInterface {
 	return &KafkaClient{}
 }
 
@@ -41,18 +41,18 @@ func (client *KafkaClient) SendMessage(message []byte) error {
 	return err
 }
 
-func SendKafkaCreateEvent(k IKafkaClient) error {
+func SendKafkaCreateEvent(k KafkaClientInterface) error {
 	return k.SendMessage([]byte(strconv.Itoa(int(createEvent))))
 }
 
-func SendKafkaUpdateEvent(k IKafkaClient) error {
+func SendKafkaUpdateEvent(k KafkaClientInterface) error {
 	return k.SendMessage([]byte(strconv.Itoa(int(updateEvent))))
 }
 
-func SendKafkaDeleteEvent(k IKafkaClient) error {
+func SendKafkaDeleteEvent(k KafkaClientInterface) error {
 	return k.SendMessage([]byte(strconv.Itoa(int(deleteEvent))))
 }
 
-func SendKafkaGetEvent(k IKafkaClient) error {
+func SendKafkaGetEvent(k KafkaClientInterface) error {
 	return k.SendMessage([]byte(strconv.Itoa(int(getEvent))))
 }
