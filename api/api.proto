@@ -2,23 +2,28 @@ syntax = "proto3";
 
 package ova.track.api;
 
-option go_package = "github.com/ova-conference-api/pkg/ova-conference-api";
+option go_package = "github.com/ova-track-api/pkg/ova-track-api";
 
 service Track{
-  rpc CreateTrack (TrackDescription) returns (TrackID) {}
+  rpc CreateTrack (TrackDescription) returns (Empty) {}
   rpc DescribeTrackByID (TrackID) returns (TrackDescription) {}
   rpc GetTrackID (TrackDescription) returns (TrackID) {}
-  rpc GetRegisteredTracks (Empty) returns (TrackDescription) {}
+  rpc GetRegisteredTracks (Empty) returns (TracksDescriptions) {}
   rpc RemoveTrackByID (TrackID) returns (Empty) {}
+  rpc MultiCreateTrack (TracksDescriptions) returns (Empty) {}
+  rpc UpdateTrack(TrackUpdateData) returns (Empty) {}
 }
 
-message Empty{
-}
 
 message TrackDescription{
   string name = 1;
   string artist = 2;
   string album = 3;
+}
+
+message TrackUpdateData{
+  TrackID id = 1;
+  TrackDescription description = 2;
 }
 
 message TracksDescriptions{
@@ -28,4 +33,6 @@ message TracksDescriptions{
 message TrackID{
   uint64 track_id = 1;
 }
+
+message Empty{}
 

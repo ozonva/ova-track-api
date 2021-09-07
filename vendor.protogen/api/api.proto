@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package ova.track.api;
+
+option go_package = "github.com/ova-track-api/pkg/ova-track-api";
+
+service Track{
+  rpc CreateTrack (TrackDescription) returns (TrackID) {}
+  rpc DescribeTrackByID (TrackID) returns (TrackDescription) {}
+  rpc GetTrackID (TrackDescription) returns (TrackID) {}
+  rpc GetRegisteredTracks (Empty) returns (TrackDescription) {}
+  rpc RemoveTrackByID (TrackID) returns (Empty) {}
+}
+
+
+message TrackDescription{
+  string name = 1;
+  string artist = 2;
+  string album = 3;
+}
+message Empty{
+}
+
+message TracksDescriptions{
+  repeated TrackDescription Item = 1;
+}
+
+message TrackID{
+  uint64 track_id = 1;
+}
+

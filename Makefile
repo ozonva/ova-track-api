@@ -1,34 +1,59 @@
-LOCAL_BIN:=$(CURDIR)/bin
+echLOCAL_BIN:=$(CURDIR)/bin
+DBSTRING:="postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@localhost:5434/$(POSTGRES_DB)?sslmode=disable"
+
 
 .PHONY: deps
 deps:
-	go get -u github.com/onsi/ginkgo
-	go get -u github.com/onsi/gomega
-	go get -u github.com/golang/mock
-	go get -u github.com/rs/zerolog/log
-	go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
-	go get -u github.com/golang/protobuf/proto
-	go get -u github.com/golang/protobuf/protoc-gen-go
-	go get -u google.golang.org/grpc
-	go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc
-	go get -u github.com/rs/zerolog/log
-	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
-	go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
+	GOBIN=$(LOCAL_BIN) go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.27.1
+    GOBIN=$(LOCAL_BIN) go install github.com/golang/protobuf/proto
+    GOBIN=$(LOCAL_BIN) go install github.com/golang/protobuf/protoc-gen-go
+    GOBIN=$(LOCAL_BIN) go install google.golang.org/grpc
+    GOBIN=$(LOCAL_BIN) go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+    GOBIN=$(LOCAL_BIN) go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
+    GOBIN=$(LOCAL_BIN) go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
+    GOBIN=$(LOCAL_BIN) go install github.com/pressly/goose/v3/cmd/goose
+    GOBIN=$(LOCAL_BIN) go install github.com/prometheus/client_golang/prometheus
+    GOBIN=$(LOCAL_BIN) go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.41.1
+
 
 .PHONY: generate
-make generate:
-	protoc --proto_path=. -I vendor.protogen \
-	--go_out=pkg/api --go_opt=paths=import \
-	--go-grpc_out=pkg/api --go-grpc_opt=paths=import \
-	api/api.proto
+generate:
+	GOBIN=$(LOCAL_BIN) protoc --proto_path=. -I vendor.protogen \
+          --go_out=pkg/api --go_opt=paths=import \
+          --go-grpc_out=pkg/api --go-grpc_opt=paths=import \
+          api/api.proto
 
+
+vendor-proto:
+	mkdir -p vendor.protogen
+	mkdir -p vendor.protogen/api/ova-track-api
+	cp api/api.proto vendor.protogen/api/api.proto
+	@if [ ! -d vendor.protogen/google ]; then \#
+		git clone https://github.com/googleapis/googleapis vendor.protogen/googleapis &&\
+		mkdir -p  vendor.protogen/google/ &&\
+		mv vendor.protogen/googleapis/google/api vendor.protogen/google &&\
+		rm -rf vendor.protogen/googleapis ;\
+	fi
+
+proto: vendor-proto generate
+
+.PHONY: migrate-up
+migrate-up:
+	GOOSE_DRIVER=postgres GOOSE_DBSTRING=$(DBSTRING) goose -dir migration status
+	GOOSE_DRIVER=postgres GOOSE_DBSTRING=$(DBSTRING) goose -dir migration up
 
 build:
 	go build -o bin/main cmd/ova-track-api/main.go
 
+.PHONY: run
 run:
-	go run cmd/ova-track-api/main.go
+	GOBIN=$(LOCAL_BIN) go run cmd/ova-track-api/main.go
 
 test:
 	go test  ./...
 
+format:
+	go fmt ./...
+
+lint:
+	golangci-lint run -v
