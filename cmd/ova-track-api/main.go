@@ -24,7 +24,6 @@ import (
 	"strconv"
 )
 
-
 func main() {
 
 	log.Println("Hi, i am ova-track-api!")
@@ -34,7 +33,7 @@ func main() {
 	ot.SetGlobalTracer(tracer)
 	defer closer.Close()
 
-	dsn :=  "postgres://admin:admin@localhost:5434/db?sslmode=disable"
+	dsn := "postgres://admin:admin@localhost:5434/db?sslmode=disable"
 
 	pdb, err := sql.Open("pgx", dsn)
 	if err != nil {
@@ -46,7 +45,7 @@ func main() {
 		log.Fatalln("failed to connect to db:", err)
 	}
 
-	port := ":"+strconv.Itoa(8080)
+	port := ":" + strconv.Itoa(8080)
 	listen, err := net.Listen("tcp", port)
 	log.Println("TCP is starting up at port ", port)
 
@@ -57,14 +56,14 @@ func main() {
 	log.Println("TCP started successfully", port)
 
 	grpcService := grpc.NewServer()
-	rp :=repo.NewSQLTrackRepo(pdb)
+	rp := repo.NewSQLTrackRepo(pdb)
 	kafkaClient := kafka.NewKafkaClient()
 	kafkaConn := "kafka:9092"
-	if kafkaConnErr := kafkaClient.Connect(context.Background(), kafkaConn, "CUDEvents",0); kafkaConnErr != nil{
+	if kafkaConnErr := kafkaClient.Connect(context.Background(), kafkaConn, "CUDEvents", 0); kafkaConnErr != nil {
 		log.Fatalf("Can not connect to kafka, %s", kafkaConnErr)
 	}
 
-	track_server.RegisterTrackServer(grpcService, api.NewApiServer(rp,api.NewApiMetrics(),kafkaClient))
+	track_server.RegisterTrackServer(grpcService, api.NewApiServer(rp, api.NewApiMetrics(), kafkaClient))
 
 	log.Println("Starting track service")
 	if err := grpcService.Serve(listen); err != nil {
@@ -78,7 +77,6 @@ func runPrometheus() {
 		log.Fatalln("failed to start listen to metric requests, error", err)
 	}
 }
-
 
 func initTracer() (ot.Tracer, io.Closer) {
 	cfg := jgrc.Configuration{

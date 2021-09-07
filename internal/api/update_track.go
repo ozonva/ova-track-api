@@ -15,12 +15,12 @@ func (s *ApiServer) UpdateTrack(ctx context.Context, req *desc.TrackUpdateData) 
 	}
 
 	_, errRemove := s.RemoveTrackByID(ctx, req.Id)
-	if errRemove != nil{
+	if errRemove != nil {
 		return nil, errRemove
 	}
 
 	_, errAdd := s.CreateTrack(ctx, req.Description)
-	if errAdd != nil{
+	if errAdd != nil {
 		return nil, errAdd
 	}
 

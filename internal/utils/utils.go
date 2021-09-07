@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func min (a int, b int) int {
+func min(a int, b int) int {
 	if a > b {
 		return b
 	}
@@ -19,8 +19,8 @@ func DivideIntoBatches(slice []uint8, batchSize int) [][]uint8 {
 	result := make([][]uint8, 0)
 	lastBegin := 0
 	for i, _ := range slice {
-		if (i+1)%batchSize == 0 || i == len (slice) - 1 {
-			result = append(result, slice[lastBegin: i + 1])
+		if (i+1)%batchSize == 0 || i == len(slice)-1 {
+			result = append(result, slice[lastBegin:i+1])
 			lastBegin = i + 1
 		}
 	}
@@ -29,15 +29,15 @@ func DivideIntoBatches(slice []uint8, batchSize int) [][]uint8 {
 
 func DivideTracksIntoBatches(tracks []Track, batchSize int) [][]Track {
 
-	dividedIntoBatches := make([][]Track, 0, 0)
+	dividedIntoBatches := make([][]Track, 0)
 	//curBatch := make([]Track, 0, 0)
 
 	for i := 0; i < len(tracks); i += batchSize {
-		next:=i+min(batchSize, len(tracks) - i)
+		next := i + min(batchSize, len(tracks)-i)
 		dividedIntoBatches = append(dividedIntoBatches, []Track{})
 		for j := i; j < next; j++ {
 			dividedIntoBatches[len(dividedIntoBatches)-1] = append(dividedIntoBatches[len(dividedIntoBatches)-1],
-				Track{tracks[j].TrackId,tracks[j].TrackName, tracks[j].Album, tracks[j].Artist })
+				Track{tracks[j].TrackId, tracks[j].TrackName, tracks[j].Album, tracks[j].Artist})
 		}
 	}
 
@@ -50,7 +50,7 @@ func InverseMap(data map[string]int) map[int]string {
 	for key, value := range data {
 		_, contains := result[value]
 		if contains {
-			panic(fmt.Sprintf( "key %d contains twice", value))
+			panic(fmt.Sprintf("key %d contains twice", value))
 		}
 		result[value] = key
 	}

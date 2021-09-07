@@ -13,7 +13,7 @@ import (
 func (s *ApiServer) MultiCreateTrack(ctx context.Context, req *desc.TracksDescriptions) (*desc.Empty, error) {
 
 	log.Info().Msgf("Multi create track call with parameters: %s", req.String())
-	if len(req.Item) == 0{
+	if len(req.Item) == 0 {
 		return nil, errors.New("multi create call with no items")
 	}
 

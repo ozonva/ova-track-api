@@ -9,51 +9,49 @@ import (
 )
 
 type TrackRepo interface {
-	Add ([]utils.Track) error
-	List (limit, offset uint64) ([]utils.Track, error)
-	Describe (id uint64) (*utils.Track, error)
-	Remove (id uint64) error
+	Add([]utils.Track) error
+	List(limit, offset uint64) ([]utils.Track, error)
+	Describe(id uint64) (*utils.Track, error)
+	Remove(id uint64) error
 }
 
-type PrintRepo struct {}
+type PrintRepo struct{}
 
-func (pr PrintRepo) Add (tracks []utils.Track) error{
+func (pr PrintRepo) Add(tracks []utils.Track) error {
 	fmt.Println("Add called", tracks)
-	return errors.New ("")
+	return errors.New("")
 }
-func (pr PrintRepo) List (limit, offset uint64) ([]utils.Track, error){
+func (pr PrintRepo) List(limit, offset uint64) ([]utils.Track, error) {
 	fmt.Printf("")
-	return nil,nil
+	return nil, nil
 }
-func (pr PrintRepo) Describe (id uint64) (*utils.Track, error){
+func (pr PrintRepo) Describe(id uint64) (*utils.Track, error) {
 	fmt.Printf("")
-	return nil,nil
+	return nil, nil
 }
 
-func (pr PrintRepo) Remove (id uint64) error{
+func (pr PrintRepo) Remove(id uint64) error {
 	fmt.Printf("")
 	return nil
 }
 
-
 type SQLTrackRepo struct {
-	db *sql.DB
+	db     *sql.DB
 	nextId uint64
 	inited bool
 }
 
-
-func NewSQLTrackRepo (pdb *sql.DB) *SQLTrackRepo {
-	repo := SQLTrackRepo {pdb, utils.InitialTrackId, false}
+func NewSQLTrackRepo(pdb *sql.DB) *SQLTrackRepo {
+	repo := SQLTrackRepo{pdb, utils.InitialTrackId, false}
 	repo.initRepo()
 	return &repo
 }
 
-func (sql *SQLTrackRepo) initRepo () {
-	if !sql.inited{
+func (sql *SQLTrackRepo) initRepo() {
+	if !sql.inited {
 		tracks, _ := sql.List(utils.MaxTrackId, 0)
-		for _, v := range tracks{
-			if v.TrackId > sql.nextId{
+		for _, v := range tracks {
+			if v.TrackId > sql.nextId {
 				sql.nextId = v.TrackId
 			}
 		}
@@ -62,8 +60,8 @@ func (sql *SQLTrackRepo) initRepo () {
 	}
 }
 
-func (sql *SQLTrackRepo) Add (tracks []utils.Track) error{
-	if sql.nextId == utils.MaxTrackId{
+func (sql *SQLTrackRepo) Add(tracks []utils.Track) error {
+	if sql.nextId == utils.MaxTrackId {
 		return errors.New("cant add anymore tracks")
 	}
 	builder := squirrel.
@@ -78,10 +76,10 @@ func (sql *SQLTrackRepo) Add (tracks []utils.Track) error{
 	if err != nil {
 		return err
 	}
-	 _, err = sql.db.Exec(query, args...)
-	 return err
+	_, err = sql.db.Exec(query, args...)
+	return err
 }
-func (sql *SQLTrackRepo) List (limit, offset uint64) ([]utils.Track, error){
+func (sql *SQLTrackRepo) List(limit, offset uint64) ([]utils.Track, error) {
 
 	var tracks utils.Track
 	result := make([]utils.Track, 0, limit)
@@ -116,7 +114,7 @@ func (sql *SQLTrackRepo) List (limit, offset uint64) ([]utils.Track, error){
 
 	return result, nil
 }
-func (sql *SQLTrackRepo) Describe (id uint64) (*utils.Track, error){
+func (sql *SQLTrackRepo) Describe(id uint64) (*utils.Track, error) {
 	var res utils.Track
 	query, args, err := squirrel.
 		Update("tracks").
@@ -142,7 +140,7 @@ func (sql *SQLTrackRepo) Describe (id uint64) (*utils.Track, error){
 	return &res, nil
 }
 
-func (sql *SQLTrackRepo) Remove (id uint64) error {
+func (sql *SQLTrackRepo) Remove(id uint64) error {
 	query, args, err := squirrel.
 		Delete("tracks").
 		Where(squirrel.Eq{"id": id}).
@@ -154,5 +152,3 @@ func (sql *SQLTrackRepo) Remove (id uint64) error {
 	_, err = sql.db.Exec(query, args...)
 	return err
 }
-
-

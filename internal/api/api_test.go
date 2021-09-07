@@ -12,11 +12,11 @@ import (
 
 var _ = Describe("Api", func() {
 	var (
-		mockCtrl *gomock.Controller
-		mockRepo *mocks.MockTrackRepo
+		mockCtrl    *gomock.Controller
+		mockRepo    *mocks.MockTrackRepo
 		mockMetrics *mocks.MockMetrics
-		mockKafka *mocks.MockIKafkaClient
-		cntx     context.Context
+		mockKafka   *mocks.MockIKafkaClient
+		cntx        context.Context
 	)
 
 	BeforeEach(func() {
@@ -32,23 +32,22 @@ var _ = Describe("Api", func() {
 	})
 
 	Context("API: UpdateTrack", func() {
-			It("Should not return error", func() {
-				mockRepo.EXPECT().Remove(uint64(5)).Times(1).Return(nil)
-				mockRepo.EXPECT().Add([]utils.Track{{0, "name_a", "album_a", "album_a"}}).Times(1).Return(nil)
-				mockMetrics.EXPECT().IncSuccessRemoveTrackCounter()
-				mockMetrics.EXPECT().IncSuccessCreateTrackCounter()
+		It("Should not return error", func() {
+			mockRepo.EXPECT().Remove(uint64(5)).Times(1).Return(nil)
+			mockRepo.EXPECT().Add([]utils.Track{{0, "name_a", "album_a", "album_a"}}).Times(1).Return(nil)
+			mockMetrics.EXPECT().IncSuccessRemoveTrackCounter()
+			mockMetrics.EXPECT().IncSuccessCreateTrackCounter()
 
-				mockKafka.EXPECT().SendMessage(gomock.Any()).AnyTimes()
+			mockKafka.EXPECT().SendMessage(gomock.Any()).AnyTimes()
 
-				trackId := desc.TrackID{TrackId: 5}
-				trackDescription := desc.TrackDescription{Name: "name_a", Album: "album_a", Artist: "artist_a"}
+			trackId := desc.TrackID{TrackId: 5}
+			trackDescription := desc.TrackDescription{Name: "name_a", Album: "album_a", Artist: "artist_a"}
 
-				api := NewApiServer(mockRepo, mockMetrics, mockKafka)
-				_, err := api.UpdateTrack(cntx, &desc.TrackUpdateData{Id: &trackId, Description: &trackDescription})
-				assert.Nil(GinkgoT(), err)
-			})
+			api := NewApiServer(mockRepo, mockMetrics, mockKafka)
+			_, err := api.UpdateTrack(cntx, &desc.TrackUpdateData{Id: &trackId, Description: &trackDescription})
+			assert.Nil(GinkgoT(), err)
+		})
 	})
-
 
 	Context("API: MultiTrackCreate", func() {
 
@@ -57,7 +56,6 @@ var _ = Describe("Api", func() {
 			mockRepo.EXPECT().Add([]utils.Track{{0, "name_a", "album_a", "artist_a"}, {0, "name_b", "album_b", "artist_b"}})
 			mockRepo.EXPECT().Add([]utils.Track{{0, "name_c", "album_c", "artist_c"}, {0, "name_d", "album_d", "artist_d"}})
 			mockRepo.EXPECT().Add([]utils.Track{{0, "name_e", "album_e", "artist_e"}})
-
 
 			tracksDescriptions := desc.TracksDescriptions{}
 			tracksDescriptions.Item = append(tracksDescriptions.Item, &desc.TrackDescription{Name: "name_a", Album: "album_a", Artist: "artist_a"})
@@ -71,7 +69,6 @@ var _ = Describe("Api", func() {
 			assert.Nil(GinkgoT(), err)
 		})
 	})
-
 
 	Context("API: DescribeTrackByID", func() {
 		It("should not error", func() {
@@ -110,9 +107,9 @@ var _ = Describe("Api", func() {
 	Context("API: GetTrackID", func() {
 		It("should not error", func() {
 
-			mockRepo.EXPECT().List(uint64(18446744073709551615),uint64(0)).Return([]utils.Track{{TrackId: 1, TrackName: "name_a", Album: "album_a", Artist: "artist_a"},
-				utils.Track{TrackId: 2,TrackName: "name_b", Album: "album_b", Artist: "artist_b"},
-				utils.Track{TrackId: 3,TrackName: "name_c", Album: "album_c", Artist: "artist_c"}}, nil)
+			mockRepo.EXPECT().List(uint64(18446744073709551615), uint64(0)).Return([]utils.Track{{TrackId: 1, TrackName: "name_a", Album: "album_a", Artist: "artist_a"},
+				utils.Track{TrackId: 2, TrackName: "name_b", Album: "album_b", Artist: "artist_b"},
+				utils.Track{TrackId: 3, TrackName: "name_c", Album: "album_c", Artist: "artist_c"}}, nil)
 			mockMetrics.EXPECT().IncGetTrackCounter()
 			mockKafka.EXPECT().SendMessage(gomock.Any()).Times(1)
 
@@ -131,9 +128,9 @@ var _ = Describe("Api", func() {
 	Context("API: GetTrackID", func() {
 		It("should return error", func() {
 
-			mockRepo.EXPECT().List(uint64(18446744073709551615),uint64(0)).Return([]utils.Track{{TrackId: 1, TrackName: "name_a", Album: "album_a", Artist: "artist_a"},
-				utils.Track{TrackId: 2,TrackName: "name_b", Album: "album_b", Artist: "artist_b"},
-				utils.Track{TrackId: 3,TrackName: "name_c", Album: "album_c", Artist: "artist_c"}}, nil)
+			mockRepo.EXPECT().List(uint64(18446744073709551615), uint64(0)).Return([]utils.Track{{TrackId: 1, TrackName: "name_a", Album: "album_a", Artist: "artist_a"},
+				utils.Track{TrackId: 2, TrackName: "name_b", Album: "album_b", Artist: "artist_b"},
+				utils.Track{TrackId: 3, TrackName: "name_c", Album: "album_c", Artist: "artist_c"}}, nil)
 
 			mockKafka.EXPECT().SendMessage(gomock.Any()).Times(1)
 
@@ -152,9 +149,9 @@ var _ = Describe("Api", func() {
 	Context("API: GetRegisteredTracks", func() {
 		It("should return all tracks", func() {
 
-			mockRepo.EXPECT().List(uint64(18446744073709551615),uint64(0)).Return([]utils.Track{{TrackId: 1, TrackName: "name_a", Album: "album_a", Artist: "artist_a"},
-				utils.Track{TrackId: 2,TrackName: "name_b", Album: "album_b", Artist: "artist_b"},
-				utils.Track{TrackId: 3,TrackName: "name_c", Album: "album_c", Artist: "artist_c"}}, nil)
+			mockRepo.EXPECT().List(uint64(18446744073709551615), uint64(0)).Return([]utils.Track{{TrackId: 1, TrackName: "name_a", Album: "album_a", Artist: "artist_a"},
+				utils.Track{TrackId: 2, TrackName: "name_b", Album: "album_b", Artist: "artist_b"},
+				utils.Track{TrackId: 3, TrackName: "name_c", Album: "album_c", Artist: "artist_c"}}, nil)
 
 			mockKafka.EXPECT().SendMessage(gomock.Any()).Times(1)
 

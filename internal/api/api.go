@@ -8,9 +8,9 @@ import (
 
 type ApiServer struct {
 	desc.UnimplementedTrackServer
-	repo repo.TrackRepo
+	repo    repo.TrackRepo
 	metrics Metrics
-	kafka kafka_client.KafkaClientInterface
+	kafka   kafka_client.KafkaClientInterface
 }
 
 func NewApiServer(repo repo.TrackRepo, metrics Metrics, kafka kafka_client.KafkaClientInterface) desc.TrackServer {

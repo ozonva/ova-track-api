@@ -5,6 +5,7 @@ import (
 	"github.com/segmentio/kafka-go"
 	"strconv"
 )
+
 type cudEvent uint8
 
 const (

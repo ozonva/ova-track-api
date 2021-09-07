@@ -1,4 +1,3 @@
-
 package api
 
 import (
@@ -29,10 +28,8 @@ func (s *ApiServer) CreateTrack(ctx context.Context, req *desc.TrackDescription)
 	defer span.Finish()
 
 	addRes := s.repo.Add([]utils.Track{{utils.InitialTrackId, req.Name, req.Album, req.Album}})
-	if addRes == nil{
+	if addRes == nil {
 		s.metrics.IncSuccessCreateTrackCounter()
 	}
 	return nil, addRes
 }
-
-

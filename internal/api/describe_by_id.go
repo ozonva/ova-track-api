@@ -9,7 +9,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func (s *ApiServer) DescribeTrackByID (ctx context.Context, trackId *desc.TrackID) (*desc.TrackDescription, error) {
+func (s *ApiServer) DescribeTrackByID(ctx context.Context, trackId *desc.TrackID) (*desc.TrackDescription, error) {
 
 	log.Info().Caller().Uint64("Id", trackId.TrackId)
 
@@ -24,7 +24,7 @@ func (s *ApiServer) DescribeTrackByID (ctx context.Context, trackId *desc.TrackI
 	trk, err := s.repo.Describe(trackId.TrackId)
 	if err == nil {
 		s.metrics.IncGetTrackCounter()
-		return &desc.TrackDescription {Name: trk.TrackName, Artist: trk.Artist, Album: trk.Album}, nil
+		return &desc.TrackDescription{Name: trk.TrackName, Artist: trk.Artist, Album: trk.Album}, nil
 	}
-	return &desc.TrackDescription {Name: "", Artist: "", Album: ""}, err
+	return &desc.TrackDescription{Name: "", Artist: "", Album: ""}, err
 }

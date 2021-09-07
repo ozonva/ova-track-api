@@ -16,7 +16,7 @@ type metrics struct {
 	successCreateTrackCounter prometheus.Counter
 	successRemoveTrackCounter prometheus.Counter
 	successUpdateTrackCounter prometheus.Counter
-	successGetTrackCounter prometheus.Counter
+	successGetTrackCounter    prometheus.Counter
 }
 
 func NewApiMetrics() Metrics {

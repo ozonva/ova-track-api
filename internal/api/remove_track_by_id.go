@@ -7,8 +7,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-
-func (s *ApiServer) RemoveTrackByID(ctx context.Context, dsc *desc.TrackID) (*desc.Empty, error){
+func (s *ApiServer) RemoveTrackByID(ctx context.Context, dsc *desc.TrackID) (*desc.Empty, error) {
 
 	if sendError := kafka_client.SendKafkaDeleteEvent(s.kafka); sendError != nil {
 		log.Error().Msgf("Can not send get event to kafka, error: %s", sendError)
@@ -16,7 +15,7 @@ func (s *ApiServer) RemoveTrackByID(ctx context.Context, dsc *desc.TrackID) (*de
 
 	log.Info().Caller().Uint64("id", dsc.TrackId)
 	removeRes := s.repo.Remove(dsc.TrackId)
-	if removeRes == nil{
+	if removeRes == nil {
 		s.metrics.IncSuccessRemoveTrackCounter()
 	}
 	return nil, removeRes
